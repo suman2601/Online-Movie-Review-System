@@ -1,0 +1,28 @@
+{% extends 'movie/base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+             <div class="col-md-4" >
+                <img src= "{{movie.image}}" alt="{{ movie.name}}" class="img-fluid">
+             </div>
+        
+             <div class="col-md-8">
+                <h3 class="text-center">{{ movie.name}}</h3>
+                <h5>Cast: {{ movie.cast }}</h5>
+                <h5>description: {{ movie.description }}</h5>
+                <h5>category: {{ movie.category}}</h5>
+                <h5>rel_date: {{ movie.rel_date}} </h5>
+                <h5>avg_rating: {{ movie.avg_rating }}</h5>
+                <a href="{% url 'movie:update_movie' movie.id %}" class="btn btn-warning">Edit Movie</a>
+                <a href="{% url 'movie:delete_movie' movie.id %}" class="btn btn-danger">Delete Movie</a>
+             </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
