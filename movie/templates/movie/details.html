@@ -17,12 +17,59 @@
                 <h5>category: {{ movie.category}}</h5>
                 <h5>rel_date: {{ movie.rel_date}} </h5>
                 <h5>avg_rating: {{ movie.avg_rating }}</h5>
-                <a href="{% url 'movie:update_movie' movie.id %}" class="btn btn-warning">Edit Movie</a>
-                <a href="{% url 'movie:delete_movie' movie.id %}" class="btn btn-danger">Delete Movie</a>
+                {% if request.user.is_authenticated %}
+                    {% if request.user.is_superuser %}
+                        <a href="{% url 'movie:update_movie' movie.id %}" class="btn btn-warning">Edit Movie</a>
+                        <a href="{% url 'movie:delete_movie' movie.id %}" class="btn btn-danger">Delete Movie</a>
+                    {% endif %}
+                {% endif %}
              </div>
             </div>
         </div>
     </div>
+    <br>
+    <div class="card">
+        <div class="card-body">
+            <h3 class="text-center">Add Reviews</h3>
+            <form action="{% url 'movie:add_review' movie.id %}" method="POST">
+                {% csrf_token %}
+                <label for="comment">Review:</label>
+                <textarea name="comment" id="comment" cols="30" rows="5" class="form-control"></textarea>
+                
+                <label for="rating">Rating</label>
+                <input type="text" name="rating" class="form-control">
+                <br>
+                <input type="submit" value="Add Review" class="btn btn-danger">
+            </form>
+        </div>
+    </div>
+    <br>
+    <div class="card">
+        <div class="card-body">
+            <h3 class="text-center">Reviews</h3>
+                {% for review in reviews %}
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <h5 class="text-left">{{ review.user.username }}</h5>
+                                    <h5>{{ review.rating }}</h5>
+                                    {% if request.user == review.user %}
+                                        <a href="{% url 'movie:edit_review' movie.id review.id %}">Edit</a>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-9">
+                                    <p>{{ review.comment }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div><br>
+                  
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
 </div>
 
 {% endblock %}
