@@ -16,11 +16,11 @@
                 <h5>description: {{ movie.description }}</h5>
                 <h5>category: {{ movie.category}}</h5>
                 <h5>rel_date: {{ movie.rel_date}} </h5>
-                <h5>avg_rating: {{ movie.avg_rating }}</h5>
+                <h5>avg_rating: {{ average }}/10</h5>
                 {% if request.user.is_authenticated %}
                     {% if request.user.is_superuser %}
                         <a href="{% url 'movie:update_movie' movie.id %}" class="btn btn-warning">Edit Movie</a>
-                        <a href="{% url 'movie:delete_movie' movie.id %}" class="btn btn-danger">Delete Movie</a>
+                        <a href="{% url 'movie:delete_movie' movie.id %}" class="btn btn-danger" onclick="return confirm('Are you sure!!!?');">Delete Movie</a>
                     {% endif %}
                 {% endif %}
              </div>
@@ -37,7 +37,10 @@
                 <textarea name="comment" id="comment" cols="30" rows="5" class="form-control"></textarea>
                 
                 <label for="rating">Rating</label>
-                <input type="text" name="rating" class="form-control">
+                <input type="range" id="rangeInput" name="rating" min="0" max="10" value="0" step="0.5"
+                    oninput="amount.value=rangeInput.value" >
+
+                <output  name="amount"  id="amount" for="rangeInput" >0</output>
                 <br>
                 <input type="submit" value="Add Review" class="btn btn-danger">
             </form>
@@ -56,6 +59,7 @@
                                     <h5>{{ review.rating }}</h5>
                                     {% if request.user == review.user %}
                                         <a href="{% url 'movie:edit_review' movie.id review.id %}">Edit</a>
+                                        <a href="{% url 'movie:delete_review' movie.id review.id %}" onclick="return confirm('Are you sure!!!?');">Delete</a>
                                     {% endif %}
                                 </div>
                                 <div class="col-md-9">

@@ -2,11 +2,18 @@ from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from .models import *
 from .forms import *
+from django.db.models import Avg
 
 # Create your views here.
 
 def home(request):
-    allMovie = Movie.objects.all()
+    query = request.GET.get("title")
+    allMovie = None
+    if query:
+        allMovie = Movie.objects.filter(name__icontains=query)
+    else: 
+        allMovie = Movie.objects.all()
+    
     context = {
         "movies": allMovie,
     }
@@ -17,10 +24,16 @@ def home(request):
 def details(request, id):
     movie = Movie.objects.get(id=id)
     reviews = Review.objects.filter(movie=id).order_by("-comment")
-
+    average = reviews.aggregate(Avg("rating"))["rating__avg"]
+    
+    
+    if average == None:
+        average = 0
+    average = round(average, 1)
     context = {
         "movie": movie,
         "reviews": reviews,
+        "average": average,
     }
 
     return render(request, 'movie/details.html', context)
@@ -114,8 +127,12 @@ def edit_review(request, movie_id, review_id):
                 form = ReviewForm(request.POST, instance=review)
                 if form.is_valid():
                     data = form.save(commit=False)
-                    data.save()
-                    return redirect("movie:details", movie_id)
+                    if (data.rating > 10) or (data.rating < 0):
+                        error = "Out of range. Select value from 0 to 10."
+                        return render(request, 'movie/editreview.html', {"error": error, "form": form})
+                    else:
+                        data.save()
+                        return redirect("movie:details", movie_id)
             else:
                 form = ReviewForm(instance=review)
             return render(request, 'movie/editreview.html', {"form": form})
@@ -124,4 +141,14 @@ def edit_review(request, movie_id, review_id):
   
     return redirect("user:login")
 
+def delete_review(request, movie_id, review_id):
+    if request.user.is_authenticated:
+        movie = Movie.objects.get(id=movie_id)
+        review = Review.objects.get(movie=movie, id=review_id)
+
+        if request.user == review.user:
+            review.delete()
+        return redirect("movie:details", movie_id)
+    else:        
+        return redirect("user:login")             
 
