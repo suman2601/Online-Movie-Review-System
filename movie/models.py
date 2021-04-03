@@ -27,3 +27,10 @@ class Review(models.Model):
     
     def __str__(self):
         return self.user.username
+
+class Watchlist(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    item = models.ManyToManyField(Movie)
+    
+    def __str__(self):
+        return f"{self.user}'s WatchList"

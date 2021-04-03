@@ -1,9 +1,9 @@
-from django.shortcuts import render,redirect
-from django.http import HttpResponse
+from django.shortcuts import render,redirect, get_object_or_404
+from django.http import HttpResponse,HttpResponseRedirect
+from django.urls import reverse
 from .models import *
 from .forms import *
 from django.db.models import Avg
-
 # Create your views here.
 
 def home(request):
@@ -152,3 +152,32 @@ def delete_review(request, movie_id, review_id):
     else:        
         return redirect("user:login")             
 
+def watchlist_add(request, movie_id):
+    item_to_save = get_object_or_404(Movie, pk=movie_id)
+    # Check if the item already exists in that user watchlist
+    if Watchlist.objects.filter(user=request.user, item=movie_id).exists():
+        #messages.add_message(request, messages.ERROR, "You already have it in your watchlist.")
+        return HttpResponseRedirect(reverse("movie:home"))
+    
+    # Get the user watchlist or create it if it doesn't exists
+    user_list, created = Watchlist.objects.get_or_create(user=request.user)
+   
+    # Add the item through the ManyToManyField (Watchlist => item)
+    user_list.item.add(item_to_save)
+    #messages.add_message(request, messages.SUCCESS, "Successfully added to your watchlist")
+    obj = Watchlist.objects.get(user=request.user)
+    watchlist= obj.item.all()
+    for x in watchlist:
+        print(x.name)
+    return render(request, 'movie/watchlist.html', {'watchlist':watchlist})
+
+def watchlist_del(request, movie_id):
+    item_to_del = get_object_or_404(Movie, pk=movie_id)
+    obj = Watchlist.objects.get(user=request.user)
+    obj.item.remove(item_to_del)
+    return redirect("movie:home")             
+
+def watchlist_view(request):
+    obj = Watchlist.objects.get(user=request.user)
+    watchlist = obj.item.all()
+    return render(request, 'movie/watchlist.html', {'watchlist':watchlist})

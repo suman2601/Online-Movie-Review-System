@@ -25,17 +25,24 @@
             <li class="nav-item active">
               <a class="nav-link" href="{% url 'movie:home' %}">Home <span class="sr-only">(current)</span></a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'movie:add_movie' %}">Add Movie</a>
-            </li>
+            
             
             {% if user.is_authenticated %}
             <li class="nav-item">
               <li class="nav-item">
                 <a class="nav-link" href="#">{{ user.username }}</a>
               </li>
-              
-              <a class="nav-link" href="{% url 'user:logout' %}">Logout</a>
+              {% if request.user.is_superuser %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'movie:add_movie' %}">Add Movie</a>
+                </li>
+              {% endif %}
+              <li>
+                <a class="nav-link" href="{% url 'user:logout' %}">Logout</a>
+              </li>
+              <li>
+                <a class="nav-link" href="/watchlistview">WatchList</a>
+              </li>
             </li>
             {% else %}
               <li class="nav-item">

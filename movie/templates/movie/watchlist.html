@@ -1,0 +1,42 @@
+{% extends 'movie/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="container">
+    <div class="card" >
+        <div class="card-content">
+            <h3 class="text-center">WatchList</h3>
+            <form action="" method="POST">
+                {% csrf_token %}
+                <div class="card">
+                    <div class="card-body">
+                            {% for movie in watchlist %}
+                                <div class="card" id="backdrop" >
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-4" >
+                                                <img src= "{{movie.image}}" alt="{{ movie.name}}" class="img-fluid" width="50%">
+                                             </div>
+                                            <div class="text-center">
+                                                <h3 class="text-center">{{ movie.name }}</h3>
+                                                <h5 class="text-center">rel_date: {{ movie.rel_date }} </h5>
+                                                <h5>category: {{ movie.category}}</h5>
+                                                <br>            
+                                                <a href="{% url 'movie:watchlist_del' movie.id  %}" class="btn btn-danger" onclick="return confirm('Are you sure!!!?');">Delete</a>
+                                            </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><br>
+                              
+                            {% endfor %}
+                        </ul>
+                    </div>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+{% endblock %}
